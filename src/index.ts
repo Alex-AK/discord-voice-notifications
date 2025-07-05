@@ -4,6 +4,7 @@ import { loadConfig } from "./config";
 import { sendNotification } from "./notification";
 import { logger } from "./logger";
 import { HealthCheck } from "./health";
+import { HealthServer } from "./health-server";
 import { CommandsHandler } from "./commands";
 
 // Load environment variables
@@ -17,6 +18,7 @@ class VoiceNotificationBot {
   private config: ReturnType<typeof loadConfig>;
   private userJoinTimes = new Map<string, number>();
   private healthCheck: HealthCheck;
+  private healthServer: HealthServer | undefined;
   private commandsHandler: CommandsHandler;
 
   constructor() {
@@ -32,6 +34,15 @@ class VoiceNotificationBot {
     });
 
     this.healthCheck = new HealthCheck(this.client);
+
+    // Initialize health server if enabled
+    if (this.config.enableHealthEndpoint) {
+      this.healthServer = new HealthServer(
+        this.healthCheck,
+        this.config.healthPort
+      );
+    }
+
     this.commandsHandler = new CommandsHandler(
       this.client,
       this.healthCheck,
@@ -44,7 +55,7 @@ class VoiceNotificationBot {
    * Set up Discord client event handlers
    */
   private setupEventHandlers(): void {
-    this.client.once(Events.ClientReady, () => {
+    this.client.once(Events.ClientReady, async () => {
       logger.info(`✅ Bot logged in as ${this.client.user?.tag}`);
       logger.info(`📢 Monitoring voice channel activity...`);
       logger.info(
@@ -54,6 +65,16 @@ class VoiceNotificationBot {
         `📤 Leave notifications: Channel ID ${this.config.leaveNotifyChannelId}`
       );
       this.healthCheck.start();
+
+      // Start health server if enabled
+      if (this.healthServer) {
+        try {
+          await this.healthServer.start();
+        } catch (error) {
+          logger.error("Failed to start health server:", error);
+        }
+      }
+
       this.commandsHandler.registerCommands();
     });
 
@@ -152,6 +173,16 @@ class VoiceNotificationBot {
     this.userJoinTimes.clear();
 
     this.healthCheck.stop();
+
+    // Stop health server if running
+    if (this.healthServer) {
+      try {
+        await this.healthServer.stop();
+      } catch (error) {
+        logger.error("Error stopping health server:", error);
+      }
+    }
+
     await this.client.destroy();
     logger.info("👋 Bot shutdown complete");
     process.exit(0);

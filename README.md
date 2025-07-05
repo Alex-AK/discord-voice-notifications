@@ -13,6 +13,7 @@ A **privacy-first**, lightweight Discord bot that sends notifications when users
 - **Configurable**: Separate channels for join/leave, customizable timing, logging levels
 - **Production Ready**: Health monitoring, graceful shutdown, notification retry mechanism, server logging
 - **Built-in Monitoring**: Discord slash command for bot status and server statistics
+- **HTTP Health Endpoint**: RESTful health check endpoint for uptime monitoring and external health checks
 - **Modern Architecture**: TypeScript, modular design, comprehensive error handling
 - **Self-Hosting**: Deploy anywhere - no external services required
 
@@ -157,11 +158,63 @@ LEAVE_NOTIFY_CHANNEL_ID=your_leave_channel_id_here
 MINIMUM_SESSION_TIME=10000  # 10 seconds (prevents spam from quick joins/leaves)
 RETRY_DELAY=2000           # 2 seconds (retry delay for failed notifications)
 LOG_LEVEL=INFO             # ERROR, WARN, INFO, DEBUG
+
+# Health Endpoint Configuration
+HEALTH_PORT=3000           # Port for the health check HTTP endpoint (default: 3000)
+ENABLE_HEALTH_ENDPOINT=true # Enable health endpoint (default: true)
 ```
 
-## 📊 Monitoring & Status
+## 📊 Monitoring & Health
+
+### Discord Commands
 
 Use the `/status` slash command in Discord to get detailed bot information including health status, memory usage, server statistics, and configuration settings. See [COMMANDS.md](COMMANDS.md) for full details.
+
+### HTTP Health Endpoint
+
+The bot provides an HTTP health endpoint for uptime monitoring and external health checks:
+
+**Endpoint URL:** `http://localhost:3000/health` (or your configured port)
+
+**Response Format:**
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-07-05T10:30:00.000Z",
+  "uptime": 3600,
+  "discord": {
+    "connected": true,
+    "ping": 45,
+    "guilds": 1,
+    "users": 150,
+    "voiceChannels": 5
+  },
+  "system": {
+    "memoryUsageMB": 85,
+    "memoryTotalMB": 128
+  }
+}
+```
+
+**Status Codes:**
+
+- `200` - Bot is healthy and Discord connection is working
+- `503` - Bot is unhealthy (Discord disconnected or other issues)
+- `500` - Internal server error
+
+**Configuration:**
+
+- Set `HEALTH_PORT=3000` to change the port (default: 3000)
+- Set `ENABLE_HEALTH_ENDPOINT=false` to disable the endpoint
+
+**Uptime Monitoring:**
+You can use the `/health` endpoint with services like:
+
+- UptimeRobot: Monitor the endpoint URL
+- Prometheus: Scrape the JSON response
+- AWS Application Load Balancer: Use as health check target
+- Any HTTP monitoring service
 
 ## 🐳 Running the Server
 

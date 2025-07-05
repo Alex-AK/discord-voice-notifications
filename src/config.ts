@@ -12,6 +12,10 @@ export interface BotConfig {
   minimumSessionTime: number;
   /** Retry delay (in milliseconds) when notification sending fails */
   retryDelay: number;
+  /** Port for the health check HTTP server */
+  healthPort: number;
+  /** Enable health check HTTP server */
+  enableHealthEndpoint: boolean;
 }
 
 /**
@@ -20,6 +24,8 @@ export interface BotConfig {
 export const DEFAULT_CONFIG: Partial<BotConfig> = {
   minimumSessionTime: 10000, // 10 seconds
   retryDelay: 2000, // 2 seconds
+  healthPort: 3000, // Default health check port
+  enableHealthEndpoint: true, // Enable by default
 };
 
 /**
@@ -59,5 +65,10 @@ export function loadConfig(): BotConfig {
       DEFAULT_CONFIG.minimumSessionTime!,
     retryDelay:
       parseInt(process.env.RETRY_DELAY || "") || DEFAULT_CONFIG.retryDelay!,
+    healthPort:
+      parseInt(process.env.HEALTH_PORT || "") || DEFAULT_CONFIG.healthPort!,
+    enableHealthEndpoint:
+      process.env.ENABLE_HEALTH_ENDPOINT !== "false" &&
+      DEFAULT_CONFIG.enableHealthEndpoint!,
   };
 }
