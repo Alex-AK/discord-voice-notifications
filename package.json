@@ -1,7 +1,7 @@
 {
   "name": "discord-voice-notifications",
   "version": "0.1.0",
-  "description": "A Discord bot that sends notifications when users join or leave voice channels, with configurable delays to prevent spam",
+  "description": "A privacy-first, lightweight Discord bot that sends notifications when users join or leave voice channels. Built with TypeScript and designed for self-hosting with only essential dependencies.",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
