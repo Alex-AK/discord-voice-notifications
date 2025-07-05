@@ -1,0 +1,48 @@
+{
+  "name": "discord-voice-notifications",
+  "version": "0.1.0",
+  "description": "A Discord bot that sends notifications when users join or leave voice channels, with configurable delays to prevent spam",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "lint": "prettier --check src/**/*.ts",
+    "format": "prettier --write src/**/*.ts",
+    "verify": "node scripts/verify-setup.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "voice",
+    "notifications",
+    "typescript",
+    "discord.js"
+  ],
+  "author": "Alex-AK",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alex-ak/discord-voice-notifications.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alex-ak/discord-voice-notifications/issues"
+  },
+  "homepage": "https://github.com/alex-ak/discord-voice-notifications#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.21.0",
+    "dotenv": "^17.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "prettier": "^3.0.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  }
+}
